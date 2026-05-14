@@ -1,0 +1,38 @@
+<odoo>
+    <data>
+
+        <!-- QWeb Template as ir.ui.view -->
+        <record id="report_lot_barcode_template" model="ir.ui.view">
+            <field name="name">report.lot.barcode.template</field>
+            <field name="type">qweb</field>
+            <field name="arch" type="xml">
+                <t t-call="web.basic_layout">
+                    <div class="page">
+                        <t t-foreach="docs" t-as="lot">
+                            <div style="text-align:center; margin-top:50px; page-break-after: always;">
+                                <h2>
+                                    <t t-esc="lot.product_id.name"/>
+                                </h2>
+                                <img t-att-src="'/report/barcode/Code128/%s' % lot.name"
+                                     style="width:300px; height:100px;"/>
+                                <h3>
+                                    <t t-esc="lot.name"/>
+                                </h3>
+                            </div>
+                        </t>
+                    </div>
+                </t>
+            </field>
+        </record>
+
+        <!-- Report Action -->
+        <record id="report_lot_barcode" model="ir.actions.report">
+            <field name="name">Print Barcode</field>
+            <field name="model">stock.lot</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">so_bom_selection.report_lot_barcode_template</field>
+            <field name="report_file">so_bom_selection.report_lot_barcode_template</field>
+        </record>
+
+    </data>
+</odoo>

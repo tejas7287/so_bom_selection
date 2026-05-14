@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <!--
+        HTML PAGE rendered by /wo-barcode/<wo_id> and /barcode/<serial>.
+        Variables passed from controller:
+          serial          — Code128 string  e.g. WELDING-WH-MO-00042
+          barcode_image   — base64 PNG (may be None)
+          wo              — mrp.workorder record (may be empty)
+          workcenter_name — plain string
+          mo_name         — plain string
+          product_name    — plain string
+          lot             — stock.lot record (may be empty)
+    -->
+    <template id="barcode_page_template" name="Work Order Barcode Print Page">
+        <t t-call="web.layout">
+            <t t-set="head">
+                <style>
+                    * { box-sizing: border-box; }
+                    body {
+                        font-family: 'Segoe UI', Arial, sans-serif;
+                        margin: 0;
+                        background: #f0f2f5;
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        min-height: 100vh;
+                    }
+                    .label-card {
+                        background: #fff;
+                        border-radius: 10px;
+                        box-shadow: 0 4px 18px rgba(0,0,0,0.12);
+                        padding: 36px 44px 28px;
+                        text-align: center;
+                        min-width: 380px;
+                        max-width: 480px;
+                        width: 100%;
+                    }
+                    .label-header {
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: flex-start;
+                        margin-bottom: 20px;
+                        text-align: left;
+                        gap: 12px;
+                    }
+                    .label-meta { flex: 1; }
+                    .label-meta .field-label {
+                        font-size: 0.68rem;
+                        text-transform: uppercase;
+                        letter-spacing: 0.08em;
+                        color: #888;
+                        margin-bottom: 1px;
+                    }
+                    .label-meta .field-value {
+                        font-size: 0.95rem;
+                        font-weight: 600;
+                        color: #222;
+                        margin-bottom: 10px;
+                        white-space: nowrap;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                        max-width: 180px;
+                    }
+                    .label-badge {
+                        background: #017e84;
+                        color: #fff;
+                        border-radius: 6px;
+                        padding: 6px 14px;
+                        font-size: 0.78rem;
+                        font-weight: 700;
+                        letter-spacing: 0.04em;
+                        white-space: nowrap;
+                        align-self: flex-start;
+                    }
+                    .divider {
+                        border: none;
+                        border-top: 1px solid #e8e8e8;
+                        margin: 0 0 20px;
+                    }
+                    .barcode-wrap img {
+                        max-width: 320px;
+                        width: 100%;
+                        height: auto;
+                    }
+                    .serial-label {
+                        margin-top: 10px;
+                        font-size: 1rem;
+                        font-family: 'Courier New', monospace;
+                        font-weight: 700;
+                        color: #111;
+                        letter-spacing: 0.06em;
+                        word-break: break-all;
+                    }
+                    .actions {
+                        margin-top: 24px;
+                        display: flex;
+                        gap: 10px;
+                        justify-content: center;
+                    }
+                    .btn {
+                        padding: 9px 20px;
+                        border-radius: 6px;
+                        font-size: 0.9rem;
+                        cursor: pointer;
+                        text-decoration: none;
+                        display: inline-block;
+                        font-weight: 600;
+                    }
+                    .btn-primary { background: #017e84; color: #fff; border: none; }
+                    .btn-outline { background: #fff; color: #017e84; border: 2px solid #017e84; }
+                    @media print {
+                        body { background: #fff; }
+                        .label-card { box-shadow: none; border-radius: 0; }
+                        .actions { display: none !important; }
+                    }
+                </style>
+            </t>
+
+            <div class="label-card">
+                <div class="label-header">
+                    <div class="label-meta">
+                        <t t-if="workcenter_name">
+                            <div class="field-label">Work Center</div>
+                            <div class="field-value"><t t-esc="workcenter_name"/></div>
+                        </t>
+                        <t t-if="mo_name">
+                            <div class="field-label">Manufacturing Order</div>
+                            <div class="field-value"><t t-esc="mo_name"/></div>
+                        </t>
+                        <t t-if="product_name">
+                            <div class="field-label">Product</div>
+                            <div class="field-value"><t t-esc="product_name"/></div>
+                        </t>
+                    </div>
+                    <t t-if="wo and wo.state">
+                        <div class="label-badge">
+                            <t t-esc="(wo.state or '').replace('_',' ').upper()"/>
+                        </div>
+                    </t>
+                </div>
+
+                <hr class="divider"/>
+
+                <div class="barcode-wrap">
+                    <t t-if="barcode_image">
+                        <img t-att-src="'data:image/png;base64,' + barcode_image" alt="Barcode"/>
+                    </t>
+                    <t t-else="">
+                        <img t-att-src="'/report/barcode/Code128/' + serial"
+                             style="width:320px; height:100px;" alt="Barcode"/>
+                    </t>
+                </div>
+
+                <div class="serial-label"><t t-esc="serial"/></div>
+
+                <div class="actions">
+                    <a class="btn btn-primary"
+                       href="#" onclick="window.print(); return false;">🖨 Print</a>
+                    <a class="btn btn-outline"
+                       t-att-href="'/barcode/image/' + serial">⬇ Download PNG</a>
+                </div>
+            </div>
+        </t>
+    </template>
+</odoo>

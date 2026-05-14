@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<odoo>
+    <!--    Sale Order Form View Inherited-->
+    <record id="view_order_form" model="ir.ui.view">
+        <field name="name">sale.order.view.form.inherit.so.bom.selection</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <!--            <xpath expr="//field[@name='payment_term_id']" position="after">-->
+            <!--                <field name="reference_template_id"-->
+            <!--                       options="{'no_create': True}"/>-->
+            <!--            </xpath>-->
+
+            <xpath expr="//field[@name='order_line']/list/field[@name='name']" position="after">
+                <field name="bom_id" domain="[('product_tmpl_id', '=', product_template_id)]"
+                       context="{'default_product_tmpl_id': product_template_id}"/>/>
+                <!--                domain="[('product_tmpl_id', '=', product_template_id)]"-->
+                <!--                       options="{'no_create': True, 'no_create_edit':True}" string="Bill of Material"-->
+            </xpath>
+            <!--  BoM Overview smart button on sale.order form (top button box)  -->
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_open_bom_overview" type="object" class="oe_stat_button" icon="fa-sitemap"
+                        invisible="not order_line">
+                    <div class="o_field_widget o_stat_info">
+                        <span class="o_stat_text">Linked BoM</span>
+                    </div>
+                </button>
+            </xpath>
+        </field>
+    </record>
+</odoo>

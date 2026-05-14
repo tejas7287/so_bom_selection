@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <!-- MO → WORK ORDERS TAB -->
+    <record id="view_workorder_tree_cost_mo" model="ir.ui.view">
+        <field name="name">mrp.workorder.tree.cost.mo</field>
+        <field name="model">mrp.workorder</field>
+        <field name="inherit_id" ref="mrp.mrp_production_workorder_tree_editable_view_mo_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='workcenter_id']" position="after">
+                <field name="customer_ref"/>
+                <field name="wc_cost_hour"/>
+                <field name="employee_cost_hour" widget="monetary"/>
+                <field name="semi_finished_product_ids"
+                       widget="many2many_tags"
+                       invisible="state != 'done'"/>
+                <field name="wo_barcode_serial"
+                       string="WO Barcode"
+                       invisible="state != 'done'"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- OPERATIONS → WORK ORDERS LIST -->
+    <record id="view_workorder_tree_cost_list" model="ir.ui.view">
+        <field name="name">mrp.workorder.tree.cost.list</field>
+        <field name="model">mrp.workorder</field>
+        <field name="inherit_id" ref="mrp.mrp_production_workorder_tree_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='workcenter_id']" position="after">
+                <field name="customer_ref"/>
+                <field name="wc_cost_hour"/>
+                <field name="employee_cost_hour" widget="monetary"/>
+                <field name="semi_finished_product_ids"
+                       widget="many2many_tags"
+                       invisible="state != 'done'"/>
+                <field name="wo_barcode_serial"
+                       string="WO Barcode"
+                       invisible="state != 'done'"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- WORK ORDER FORM -->
+    <record id="view_workorder_form_semi_barcode" model="ir.ui.view">
+        <field name="name">mrp.workorder.form.semi.barcode</field>
+        <field name="model">mrp.workorder</field>
+        <field name="inherit_id" ref="mrp.mrp_production_workorder_form_view_inherit"/>
+        <field name="arch" type="xml">
+
+            <xpath expr="//field[@name='workcenter_id']" position="after">
+
+                <group string="Work Order Barcode">
+
+                    <!-- Always visible: the computed serial for this WO -->
+                    <field name="wo_barcode_serial"
+                           string="Barcode Serial"
+                           readonly="1"/>
+
+                    <!-- Print barcode — always available once WO exists -->
+                    <button string="🔲 Print WO Barcode"
+                            type="object"
+                            name="action_open_barcode_controller"
+                            class="btn btn-primary"/>
+
+                </group>
+
+                <group string="Semi-Finished Output"
+                       invisible="not semi_finished_lot_id">
+
+                    <field name="semi_finished_lot_id" readonly="1"/>
+
+                    <button string="📋 Open Lot Form"
+                            type="object"
+                            name="action_open_semi_barcode"
+                            class="btn btn-secondary"
+                            invisible="not semi_finished_lot_id"/>
+
+                </group>
+
+            </xpath>
+
+        </field>
+    </record>
+
+    <!-- STOCK LOT FORM — add Print Barcode button -->
+    <record id="view_stock_lot_form_barcode_inherit" model="ir.ui.view">
+        <field name="name">stock.lot.form.barcode.inherit</field>
+        <field name="model">stock.lot</field>
+        <field name="inherit_id" ref="stock.view_production_lot_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='action_open_barcode']" position="after">
+                <button name="action_print_barcode"
+                        type="object"
+                        string="Print Barcode"
+                        class="btn btn-secondary"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- PRODUCT FORM — semi-finished flag -->
+    <record id="product_template_semi_finished_form" model="ir.ui.view">
+        <field name="name">product.template.semi.finished</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_only_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='type']" position="after">
+                <field name="is_semi_finished"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- WORK CENTER FORM — semi-finished goods + production location -->
+    <record id="mrp_workcenter_semi_finished_form" model="ir.ui.view">
+        <field name="name">mrp.workcenter.semi.finished</field>
+        <field name="model">mrp.workcenter</field>
+        <field name="inherit_id" ref="mrp.mrp_workcenter_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='resource_calendar_id']" position="after">
+                <group string="Semi Finished Output">
+                    <field name="semi_finished_product_ids" widget="many2many_tags"/>
+                    <field name="location_id"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
